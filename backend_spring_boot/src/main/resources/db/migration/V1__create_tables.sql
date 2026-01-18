@@ -1,0 +1,47 @@
+CREATE TABLE projects (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  code VARCHAR(64) NOT NULL UNIQUE,
+  name VARCHAR(200) NOT NULL,
+  logo_path VARCHAR(500) NULL,
+  primary_color VARCHAR(20) NULL,
+  secondary_color VARCHAR(20) NULL,
+  address VARCHAR(500) NULL,
+  phone VARCHAR(50) NULL,
+  email VARCHAR(120) NULL,
+  footer_note VARCHAR(500) NULL,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  receipt_extra_schema JSON NULL,
+  receipt_seq BIGINT NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE receipts (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  project_id BIGINT NOT NULL,
+  receipt_no BIGINT NOT NULL,
+  date_time DATETIME NOT NULL,
+  customer_name VARCHAR(200) NULL,
+  customer_phone VARCHAR(50) NULL,
+  payment_mode VARCHAR(20) NOT NULL,
+  subtotal DECIMAL(12,2) NOT NULL,
+  discount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  tax DECIMAL(12,2) NOT NULL DEFAULT 0,
+  grand_total DECIMAL(12,2) NOT NULL,
+  notes VARCHAR(500) NULL,
+  extra_data JSON NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_receipts_project FOREIGN KEY (project_id) REFERENCES projects(id),
+  UNIQUE KEY uq_project_receiptno (project_id, receipt_no)
+) ENGINE=InnoDB;
+
+CREATE TABLE receipt_items (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  receipt_id BIGINT NOT NULL,
+  item_name VARCHAR(200) NOT NULL,
+  qty DECIMAL(12,3) NOT NULL,
+  unit_price DECIMAL(12,2) NOT NULL,
+  line_total DECIMAL(12,2) NOT NULL,
+  CONSTRAINT fk_items_receipt FOREIGN KEY (receipt_id) REFERENCES receipts(id)
+) ENGINE=InnoDB;
